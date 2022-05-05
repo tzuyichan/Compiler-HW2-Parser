@@ -2,3 +2,5 @@
 *.out
 myparser
 lex.*
+y.*
+venv/
