@@ -12,7 +12,7 @@ typedef struct
 {
     int current_scope;
     int next_free_addr;
-    Table *table;
+    Table *first;
 } Table_head;
 
 Table_head *init_table();

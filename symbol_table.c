@@ -22,7 +22,7 @@ Table_head *init_table()
     FAIL_IF(!(T = malloc(sizeof(Table_head))), "Table head malloc failure!");
     T->current_scope = -1;
     T->next_free_addr = 0;
-    T->table = NULL;
+    T->first = NULL;
 
     return T;
 }
@@ -33,6 +33,6 @@ void add_table(Table_head *T)
     FAIL_IF(!(ST = malloc(sizeof(Table))), "Table malloc failure!");
     ST->scope = ++(T->current_scope);
     ST->index_cnt = 0;
-    ST->next = T->table;
-    T->table = ST;
+    ST->next = T->first;
+    T->first = ST;
 }
