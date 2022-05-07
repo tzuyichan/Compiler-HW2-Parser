@@ -148,6 +148,8 @@ StatementList
 ;
 
 Statement
+    : DeclarationStmt NEWLINE
+    | SimpleStmt NEWLINE
     /* | Block
     | IfStmt
     | ForStmt
@@ -156,6 +158,21 @@ Statement
     | PrintStmt NEWLINE
     /* | ReturnStmt NEWLINE */
     | NEWLINE
+;
+
+DeclarationStmt
+    : VAR IDENT Type DeclAssignment     { insert_symbol($2); }
+;
+
+DeclAssignment
+    : ASSIGN Expression
+    | /* empty */
+;
+
+SimpleStmt
+    : AssignmentStmt
+    | Expression
+    | IncDecStmt
 ;
 
 /* IfStmt
