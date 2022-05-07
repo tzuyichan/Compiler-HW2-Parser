@@ -142,8 +142,41 @@ Block
     : '{' StatementList '}'
 ;
 
+StatementList
+    : StatementList Statement
+    | /* empty */
+;
+
+Statement
+    /* | Block
+    | IfStmt
+    | ForStmt
+    | SwitchStmt
+    | CaseStmt */
+    | PrintStmt NEWLINE
+    /* | ReturnStmt NEWLINE */
+    | NEWLINE
+;
+
+/* IfStmt
     :
 ;
+
+ForStmt
+    :
+;
+
+SwitchStmt
+    :
+;
+
+CaseStmt
+    :
+; */
+
+/* ReturnStmt
+    :
+; */
 
 %%
 
