@@ -204,6 +204,11 @@ AssignmentStmt
     : IDENT ASSIGN Expression
 ;
 
+IncDecStmt
+    : Operand INC       { printf("INC\n"); }
+    | Operand DEC       { printf("DEC\n"); }
+;
+
 %%
 
 /* C code section */
