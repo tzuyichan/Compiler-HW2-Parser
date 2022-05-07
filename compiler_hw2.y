@@ -3,6 +3,8 @@
 /* Definition section */
 %{
     #include "compiler_hw_common.h" //Extern variables that communicate with lex
+    #include "symbol_table.h"
+    #include "table_list.h"
     // #define YYDEBUG 1
     // int yydebug = 1;
 
@@ -33,6 +35,7 @@
     int SCOPE_LVL = 0;
     int NEXT_FREE_ADDR = 0;
     char CURRENT_FUNC[ID_MAX_LEN];
+    Table_head *T;
 %}
 
 %error-verbose
@@ -289,6 +292,7 @@ int main(int argc, char *argv[])
     }
 
     yylineno = 0;
+    T = init_table();
     yyparse();
 
 	printf("Total lines: %d\n", yylineno);
