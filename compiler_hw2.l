@@ -8,7 +8,6 @@
 
     #define YY_NO_UNPUT
     #define YY_NO_INPUT
-    #define XXX printf("not implemented yet!\n")
 %}
 
 /* Define regular expression label */
@@ -39,28 +38,28 @@ fnumber ({digit}*\.{digit}+)
 <STR>[^\"]* { yylval.s_val = strdup(yytext);
                 return STRING_LIT;
             }
-"+"         { return '+'; }
-"-"         { return '-'; }
-"*"         { return '*'; }
-"/"         { return '/'; }
-"%"         { return '%'; }
+"+"         { return ADD; }
+"-"         { return SUB; }
+"*"         { return MUL; }
+"/"         { return QUO; }
+"%"         { return REM; }
 "++"        { return INC; }
 "--"        { return DEC; }
-">"         { return '>'; }
-"<"         { return '<'; }
+">"         { return GTR; }
+"<"         { return LSS; }
 ">="        { return GEQ; }
-"<="        { return XXX; }
-"=="        { return XXX; }
-"!="        { return XXX; }
-"="         { return '='; }
+"<="        { return LEQ; }
+"=="        { return EQL; }
+"!="        { return NEQ; }
+"="         { return ASSIGN; }
 "+="        { return ADD_ASSIGN; }
 "-="        { return SUB_ASSIGN; }
-"*="        { return XXX; }
-"/="        { return XXX; }
-"%="        { return XXX; }
+"*="        { return MUL_ASSIGN; }
+"/="        { return QUO_ASSIGN; }
+"%="        { return REM_ASSIGN; }
 "&&"        { return LAND; }
 "||"        { return LOR; }
-"!"         { return '!'; }
+"!"         { return NOT; }
 "("         { return '('; }
 ")"         { return ')'; }
 "["         { return '['; }
@@ -71,7 +70,7 @@ fnumber ({digit}*\.{digit}+)
 ","         { return ','; }
 "\n"        { return NEWLINE; }
 "print"     { return PRINT; }
-"println"   { return XXX; }
+"println"   { return PRINTLN; }
 "if"        { return IF; }
 "else"      { return ELSE; }
 "for"       { return FOR; }
@@ -79,14 +78,24 @@ fnumber ({digit}*\.{digit}+)
 "float32"   { return FLOAT;}
 "string"    { return STRING; }
 "bool"      { return BOOL; }
-"true"      { XXX; }
-"false"     { XXX; }
+"true"      { return TRUE_; }
+"false"     { return FALSE_; }
 "var"       { return VAR; }
+"func"      { return FUNC; }
+"package"   { return PACKAGE; }
+"return"    { return RETURN; }
+"switch"    { return SWITCH; }
+"case"      { return CASE; }
+"default"   { return DEFAULT; }
 {inumber}   { yylval.i_val = atoi(yytext);
                 return INT_LIT;
             }
-{fnumber}   { XXX; }
-{id}        { XXX; }
+{fnumber}   { yylval.f_val = atof(yytext);
+                return FLOAT_LIT;
+            }
+{id}        { yylval.s_val = strdup(yytext);
+                return IDENT;
+            }
 <<EOF>>     { static int once = 0;
                 if (once++) {
                     yyterminate();
