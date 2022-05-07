@@ -200,6 +200,10 @@ PrintStmt
     :
 ; */
 
+AssignmentStmt
+    : IDENT ASSIGN Expression
+;
+
 %%
 
 /* C code section */
