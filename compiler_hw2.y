@@ -209,6 +209,70 @@ IncDecStmt
     | Operand DEC       { printf("DEC\n"); }
 ;
 
+ParenthesisExpr
+    : '(' Expression ')'
+;
+
+Expression
+    : LogOrExpr
+;
+
+LogOrExpr
+    : LogAndExpr
+    | LogOrExpr LOR LogAndExpr           { printf("LOR\n"); }
+;
+
+LogAndExpr
+    : CmpExpr
+    | LogAndExpr LAND CmpExpr          { printf("LAND\n"); }
+;
+
+CmpExpr
+    : AddExpr
+    | CmpExpr EQL AddExpr           { printf("EQL\n"); }
+    | CmpExpr NEQ AddExpr           { printf("NEQ\n"); }
+    | CmpExpr LSS AddExpr           { printf("LSS\n"); }
+    | CmpExpr LEQ AddExpr           { printf("LEQ\n"); }
+    | CmpExpr GTR AddExpr           { printf("GTR\n"); }
+    | CmpExpr GEQ AddExpr           { printf("GEQ\n"); }
+;
+
+AddExpr
+    : MulExpr
+    | AddExpr ADD MulExpr           { printf("ADD\n"); }
+    | AddExpr SUB MulExpr           { printf("SUB\n"); }
+;
+
+MulExpr
+    : UnaryExpr
+    | MulExpr MUL UnaryExpr           { printf("MUL\n"); }
+    | MulExpr QUO UnaryExpr           { printf("QUO\n"); }
+    | MulExpr REM UnaryExpr           { printf("REM\n"); }
+;
+
+UnaryExpr
+    : PrimaryExpr
+    | ADD PrimaryExpr       { printf("POS\n"); }
+    | SUB PrimaryExpr       { printf("NEG\n"); }
+    | NOT PrimaryExpr       { printf("NOT\n"); }
+;
+
+PrimaryExpr
+    : Operand
+    | STRING_LIT
+    | ParenthesisExpr
+;
+
+Operand
+    : Constant
+    | IDENT             { printf("IDENT (name=%s, address=%d)\n", $1, -1); }
+;
+
+Constant
+    : INT_LIT           { printf("INT_LIT %d\n", $1); }
+    | FLOAT_LIT         { printf("FLOAT_LIT %f\n", $1); } 
+;
+
 %%
 
 /* C code section */
