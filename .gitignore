@@ -4,3 +4,4 @@ myparser
 lex.*
 y.*
 venv/
+*.o
