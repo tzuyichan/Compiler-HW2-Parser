@@ -45,19 +45,26 @@
 }
 
 /* Token without return */
-%token VAR NEWLINE
 %token INT FLOAT BOOL STRING
-%token INC DEC GEQ LOR LAND
-%token ADD_ASSIGN SUB_ASSIGN
-%token IF ELSE FOR SWITCH CASE
-%token PRINT
+%token NOT TRUE_ FALSE_
+%token MUL QUO REM
+%token ADD SUB
+%token INC DEC 
+%token EQL NEQ GTR GEQ LSS LEQ 
+%token LAND LOR
+%token VAR 
+%token ASSIGN ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN QUO_ASSIGN REM_ASSIGN
+%token IF ELSE FOR SWITCH CASE DEFAULT
+%token PRINT PRINTLN NEWLINE
+%token PACKAGE FUNC RETURN
 
 /* Token with return, which need to sepcify type */
 %token <i_val> INT_LIT
-%token <s_val> STRING_LIT
+%token <f_val> FLOAT_LIT
+%token <s_val> STRING_LIT IDENT 
 
 /* Nonterminal with return, which need to sepcify type */
-%type <s_val> Type
+%type <s_val> Type ReturnType 
 
 /* Yacc will start at this nonterminal */
 %start Program
