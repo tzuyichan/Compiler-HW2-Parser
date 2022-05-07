@@ -191,6 +191,11 @@ CaseStmt
     :
 ; */
 
+PrintStmt
+    : PRINT ParenthesisExpr
+    | PRINTLN ParenthesisExpr       { printf("PRINTLN %s\n", "int32"); }
+;
+
 /* ReturnStmt
     :
 ; */
