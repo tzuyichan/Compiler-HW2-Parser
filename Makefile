@@ -9,7 +9,7 @@ VERBOSE := 0
 
 all: ${TARGET}
 
-${TARGET}: lex.yy.c y.tab.c
+${TARGET}: lex.yy.c y.tab.c symbol_table.o table_list.o
 	${CC} ${CFLAGS} -o $@ $^
 
 lex.yy.c: ${LEX_SRC} ${HEADER}
@@ -22,4 +22,4 @@ judge: all
 	@judge -v ${VERBOSE}
 
 clean:
-	rm -f ${TARGET} y.tab.* y.output lex.*
+	rm -f ${TARGET} y.tab.* y.output lex.* *.o
