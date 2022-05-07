@@ -22,13 +22,17 @@
 
     /* Symbol table function - you can add new functions if needed. */
     /* parameters and return type can be changed */
-    static void create_symbol();
-    static void insert_symbol();
+    static void create_sym_table();
+    static void insert_symbol(char *);
+    static void insert_func();
     static void lookup_symbol();
-    static void dump_symbol();
+    static void dump_sym_table();
 
     /* Global variables */
     bool HAS_ERROR = false;
+    int SCOPE_LVL = 0;
+    int NEXT_FREE_ADDR = 0;
+    char CURRENT_FUNC[ID_MAX_LEN];
 %}
 
 %error-verbose
@@ -292,18 +296,22 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-static void create_symbol() {
-    printf("> Create symbol table (scope level %d)\n", 0);
+static void create_sym_table() {
+    printf("> Create symbol table (scope level %d)\n", T->current_scope);
 }
 
-static void insert_symbol() {
-    printf("> Insert `%s` (addr: %d) to scope level %d\n", "XXX", 0, 0);
+static void insert_symbol(char *name) {
+    printf("> Insert `%s` (addr: %d) to scope level %d\n", name, NEXT_FREE_ADDR++, SCOPE_LVL);
+}
+
+static void insert_func(char *name) {
+    printf("> Insert `%s` (addr: %d) to scope level %d\n", name, -1, SCOPE_LVL - 1);
 }
 
 static void lookup_symbol() {
 }
 
-static void dump_symbol() {
+static void dump_sym_table() {
     printf("\n> Dump symbol table (scope level: %d)\n", 0);
     printf("%-10s%-10s%-10s%-10s%-10s%-10s\n",
            "Index", "Name", "Type", "Addr", "Lineno", "Func_sig");
