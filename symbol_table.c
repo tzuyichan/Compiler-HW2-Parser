@@ -27,6 +27,12 @@ Table_head *init_table()
     return T;
 }
 
+void add_table(Table_head *T)
 {
-    return a + b;
+    Table *ST;
+    FAIL_IF(!(ST = malloc(sizeof(Table))), "Table malloc failure!");
+    ST->scope = ++(T->current_scope);
+    ST->index_cnt = 0;
+    ST->next = T->table;
+    T->table = ST;
 }

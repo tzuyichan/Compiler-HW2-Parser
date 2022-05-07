@@ -301,6 +301,7 @@ int main(int argc, char *argv[])
 }
 
 static void create_sym_table() {
+    add_table(T);
     printf("> Create symbol table (scope level %d)\n", T->current_scope);
 }
 

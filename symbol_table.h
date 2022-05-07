@@ -16,5 +16,6 @@ typedef struct
 } Table_head;
 
 Table_head *init_table();
+void add_table(Table_head *T);
 
 #endif
