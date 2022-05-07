@@ -73,7 +73,7 @@
 %%
 
 Program
-    : GlobalStatementList
+    : { create_sym_table(); } GlobalStatementList { dump_sym_table(); }
 ;
 
 GlobalStatementList 
@@ -89,10 +89,59 @@ GlobalStatement
 
 
 PackageStmt
-    :
+    : PACKAGE IDENT     { printf("package: %s\n", $2); }
 ;
 
 FunctionDeclStmt
+    : FuncOpen '(' ParameterList ')' ReturnType {
+        printf("func_signature: ()%c\n", $5[0]);
+        insert_func(CURRENT_FUNC);
+    }
+    FuncBlock
+;
+
+FuncOpen
+    : FUNC IDENT {
+        strncpy(CURRENT_FUNC, $2, ID_MAX_LEN);
+        printf("func: %s\n", CURRENT_FUNC);
+        SCOPE_LVL++;
+        create_sym_table();
+    }
+;
+
+ParameterList
+    : ParameterList ',' ParameterIdentType
+    | ParameterIdentType
+    | /* empty */
+;
+
+ReturnType
+    : Type
+    | /* empty */       { $$ = "V"; }
+;
+
+FuncBlock
+    : Block
+;
+
+ParameterIdentType
+    : IDENT Type {
+        printf("param %s, type: %c\n", $1, $2[0]);
+        insert_symbol($1);
+    }
+;
+
+Type
+    : INT           { $$ = "int32"; }
+    | FLOAT         { $$ = "float32"; }
+    | STRING        { $$ = "string"; }
+    | BOOL          { $$ = "bool"; }
+;
+
+Block
+    : '{' StatementList '}'
+;
+
     :
 ;
 
