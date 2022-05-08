@@ -27,7 +27,7 @@
     static void create_sym_table();
     static void insert_symbol(char *name, char *type);
     static void insert_func();
-    static void lookup_symbol();
+    static void lookup_symbol(char *name);
     static void dump_sym_table();
 
     /* Global variables */
@@ -272,7 +272,7 @@ PrimaryExpr
 
 Operand
     : Constant
-    | IDENT             { printf("IDENT (name=%s, address=%d)\n", $1, -1); }
+    | IDENT             { lookup_symbol($1); }
 ;
 
 Constant
@@ -315,7 +315,12 @@ static void insert_func(char *name) {
     printf("> Insert `%s` (addr: %d) to scope level %d\n", name, -1, SCOPE_LVL - 1);
 }
 
-static void lookup_symbol() {
+static void lookup_symbol(char *name) {
+    /* printf("lookup func called!\n"); */
+    Result *R = find_symbol(T, name);
+    if (R)
+        printf("IDENT (name=%s, address=%d)\n", name, R->addr); 
+    free(R);
 }
 
 static void dump_sym_table() {
