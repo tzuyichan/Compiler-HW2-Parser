@@ -21,4 +21,18 @@ List *init_list()
     L->first = NULL;
 
     return L;
+
+Node *init_node()
+{
+    Node *N;
+    FAIL_IF(!(N = malloc(sizeof(Node))), "Node malloc failure!");
+    N->index = -1;
+    strcpy(N->name, "?");
+    strcpy(N->type, "?");
+    N->addr = -2;
+    N->lineno = -1;
+    strcpy(N->func_sig, "?");
+    N->next = NULL;
+
+    return N;
 }

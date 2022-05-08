@@ -20,5 +20,6 @@ typedef struct node_t
 } Node;
 
 List *init_list();
+Node *init_node();
 
 #endif
