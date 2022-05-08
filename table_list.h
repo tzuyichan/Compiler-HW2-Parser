@@ -21,6 +21,7 @@ typedef struct node_t
 
 typedef struct
 {
+    int scope;
     int addr;
     char type[8];
 } Result;

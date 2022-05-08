@@ -39,21 +39,33 @@ void add_table(Table_head *T)
     T->first = ST;
 }
 
-void add_symbol(Table_head *T, char *name, char *type, int lineno, char *func_sig)
+Result *add_symbol(Table_head *T, char *name, char *type, int lineno, char *func_sig)
 {
-    Node *N = init_node();
-    // copy table contents into new node
-    N->index = (T->first->index_cnt)++;
-    strncpy(N->name, name, ID_MAX_LEN);
-    strncpy(N->type, type, 8);
-    N->addr = (T->next_free_addr)++;
-    N->lineno = lineno;
-    strncpy(N->func_sig, func_sig, ID_MAX_LEN);
-    N->next = NULL;
+    Node *entry = init_node();
 
-    enqueue(T->first->list, N);
+    bool is_func = strcmp(type, "func") == 0 ? true : false;
+    // copy table contents into new node
+    entry->index = is_func ? (T->first->next->index_cnt)++ : (T->first->index_cnt)++;
+    strncpy(entry->name, name, ID_MAX_LEN);
+    strncpy(entry->type, type, 8);
+    entry->addr = is_func ? -1 : (T->next_free_addr)++;
+    entry->lineno = lineno;
+    strncpy(entry->func_sig, func_sig, ID_MAX_LEN);
+    entry->next = NULL;
+
+    if (is_func)
+        enqueue(T->first->next->list, entry);
+    else
+        enqueue(T->first->list, entry);
+
+    Result *result;
+    FAIL_IF(!(result = malloc(sizeof(Result))), "Insert result malloc failure!");
+    result->addr = entry->addr;
+    result->scope = is_func ? T->current_scope - 1 : T->current_scope;
     // printf("index: %d, name: %s, type: %s, addr: %d, line#: %d, func: %s\n",
-    //        N->index, N->name, N->type, N->addr, N->lineno, N->func_sig);
+    //        entry->index, entry->name, entry->type, entry->addr, entry->lineno, entry->func_sig);
+
+    return result;
 }
 
 Result *find_symbol(Table_head *T, char *name)
