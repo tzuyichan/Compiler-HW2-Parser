@@ -21,6 +21,7 @@ List *init_list()
     L->first = NULL;
 
     return L;
+}
 
 Node *init_node()
 {
@@ -35,4 +36,24 @@ Node *init_node()
     N->next = NULL;
 
     return N;
+}
+
+int enqueue(List *L, Node *N)
+{
+    Node *p;
+
+    for (p = L->first; p != NULL; p = p->next)
+    {
+        if (p->name == N->name)
+            return -1;
+        if (!p->next)
+            break;
+    } // p = last node in the linked list
+
+    if (!p)
+        L->first = N;
+    else
+        p->next = N;
+
+    return 0;
 }

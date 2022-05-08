@@ -21,5 +21,6 @@ typedef struct node_t
 
 List *init_list();
 Node *init_node();
+int enqueue(List *L, Node *N);
 
 #endif
