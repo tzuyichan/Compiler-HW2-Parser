@@ -52,6 +52,21 @@ void add_symbol(Table_head *T, char *name, char *type, int lineno, char *func_si
     N->next = NULL;
 
     enqueue(T->first->list, N);
-    printf("index: %d, name: %s, type: %s, addr: %d, line#: %d, func: %s\n",
-           N->index, N->name, N->type, N->addr, N->lineno, N->func_sig);
+    // printf("index: %d, name: %s, type: %s, addr: %d, line#: %d, func: %s\n",
+    //        N->index, N->name, N->type, N->addr, N->lineno, N->func_sig);
+}
+
+Result *find_symbol(Table_head *T, char *name)
+{
+    Result *R;
+
+    for (Table *p = T->first; p != NULL; p = p->next)
+    {
+        if (R = get_entry(p->list, name))
+            return R;
+        if (!p->next)
+            break;
+    }
+
+    return NULL;
 }
