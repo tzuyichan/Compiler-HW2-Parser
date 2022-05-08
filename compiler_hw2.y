@@ -35,6 +35,7 @@
     int SCOPE_LVL = 0;
     int NEXT_FREE_ADDR = 0;
     char CURRENT_FUNC[ID_MAX_LEN];
+    int CURRENT_FUNC_LINENO;
     Table_head *T;
 %}
 
@@ -102,7 +103,8 @@ PackageStmt
 FunctionDeclStmt
     : FuncOpen '(' ParameterList ')' ReturnType {
         printf("func_signature: ()%c\n", $5[0]);
-        insert_func(CURRENT_FUNC);
+        // insert_func(CURRENT_FUNC);
+        insert_symbol(CURRENT_FUNC, "func");
     }
     FuncBlock
 ;
@@ -110,6 +112,7 @@ FunctionDeclStmt
 FuncOpen
     : FUNC IDENT {
         strncpy(CURRENT_FUNC, $2, ID_MAX_LEN);
+        CURRENT_FUNC_LINENO = yylineno;
         printf("func: %s\n", CURRENT_FUNC);
         SCOPE_LVL++;
         create_sym_table();
@@ -306,9 +309,25 @@ static void create_sym_table() {
 }
 
 static void insert_symbol(char *name, char *type) {
-    add_symbol(T, name, type, yylineno, "-");
+    int lineno;
+    char func_sig[ID_MAX_LEN];
+    if (strcmp(type, "func") == 0)
+    {
+        // generate function signature
+        lineno = CURRENT_FUNC_LINENO;
+        strncpy(func_sig, "-", ID_MAX_LEN);
+    }
+    else
+    {
+        lineno = yylineno;
+        strncpy(func_sig, "-", ID_MAX_LEN);
+    }
+
+    Result *entry;
+    entry = add_symbol(T, name, type, lineno, func_sig);
+
     printf("> Insert `%s` (addr: %d) to scope level %d\n", 
-           name, T->next_free_addr - 1, T->current_scope);
+           name, entry->addr, entry->scope);
 }
 
 static void insert_func(char *name) {
