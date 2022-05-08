@@ -88,3 +88,11 @@ Node *dequeue(List *L)
     }
     return NULL;
 }
+
+void delete_list(List *L)
+{
+    Node *p;
+    while (p = dequeue(L))
+        free(p);
+    free(L);
+}

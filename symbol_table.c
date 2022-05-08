@@ -75,3 +75,18 @@ Node *dump_next_entry(Table_head *T)
 {
     return dequeue(T->first->list);
 }
+
+void delete_table(Table_head *T)
+{
+    Table *p;
+    if (p = T->first)
+    {
+        T->first = p->next;
+        p->next = NULL;
+    }
+
+    (T->current_scope)--;
+
+    delete_list(p->list);
+    free(p);
+}
