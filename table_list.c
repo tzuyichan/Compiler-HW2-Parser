@@ -57,3 +57,22 @@ int enqueue(List *L, Node *N)
 
     return 0;
 }
+
+Result *get_entry(List *L, char *name)
+{
+    for (Node *p = L->first; p != NULL; p = p->next)
+    {
+        if (strcmp(p->name, name) == 0)
+        {
+            Result *R;
+            FAIL_IF(!(R = malloc(sizeof(Result))), "Lookup result malloc failure!");
+            R->addr = p->addr;
+            strncpy(R->type, p->type, 8);
+            return R;
+        }
+        if (!p->next)
+            break;
+    }
+
+    return NULL;
+}

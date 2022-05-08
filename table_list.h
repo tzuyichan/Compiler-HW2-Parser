@@ -19,8 +19,15 @@ typedef struct node_t
     struct node_t *next;
 } Node;
 
+typedef struct
+{
+    int addr;
+    char type[8];
+} Result;
+
 List *init_list();
 Node *init_node();
 int enqueue(List *L, Node *N);
+Result *get_entry(List *L, char *name);
 
 #endif
