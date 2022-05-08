@@ -29,5 +29,6 @@ List *init_list();
 Node *init_node();
 int enqueue(List *L, Node *N);
 Result *get_entry(List *L, char *name);
+Node *dequeue(List *L);
 
 #endif

@@ -19,5 +19,6 @@ Table_head *init_table();
 void add_table(Table_head *T);
 void add_symbol(Table_head *T, char *name, char *type, int lineno, char *func_sig);
 Result *find_symbol(Table_head *T, char *name);
+Node *dump_next_entry(Table_head *T);
 
 #endif

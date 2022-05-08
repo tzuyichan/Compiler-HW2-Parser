@@ -70,3 +70,8 @@ Result *find_symbol(Table_head *T, char *name)
 
     return NULL;
 }
+
+Node *dump_next_entry(Table_head *T)
+{
+    return dequeue(T->first->list);
+}

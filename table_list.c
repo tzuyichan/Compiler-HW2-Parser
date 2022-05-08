@@ -76,3 +76,15 @@ Result *get_entry(List *L, char *name)
 
     return NULL;
 }
+
+Node *dequeue(List *L)
+{
+    Node *p;
+    if (p = L->first)
+    {
+        L->first = p->next;
+        p->next = NULL;
+        return p;
+    }
+    return NULL;
+}
