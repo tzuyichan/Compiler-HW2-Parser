@@ -25,7 +25,7 @@
     /* Symbol table function - you can add new functions if needed. */
     /* parameters and return type can be changed */
     static void create_sym_table();
-    static void insert_symbol(char *);
+    static void insert_symbol(char *name, char *type);
     static void insert_func();
     static void lookup_symbol();
     static void dump_sym_table();
@@ -134,7 +134,7 @@ FuncBlock
 ParameterIdentType
     : IDENT Type {
         printf("param %s, type: %c\n", $1, $2[0]);
-        insert_symbol($1);
+        insert_symbol($1, $2);
     }
 ;
 
@@ -168,7 +168,7 @@ Statement
 ;
 
 DeclarationStmt
-    : VAR IDENT Type DeclAssignment     { insert_symbol($2); }
+    : VAR IDENT Type DeclAssignment     { insert_symbol($2, $3); }
 ;
 
 DeclAssignment
@@ -305,8 +305,10 @@ static void create_sym_table() {
     printf("> Create symbol table (scope level %d)\n", T->current_scope);
 }
 
-static void insert_symbol(char *name) {
-    printf("> Insert `%s` (addr: %d) to scope level %d\n", name, NEXT_FREE_ADDR++, SCOPE_LVL);
+static void insert_symbol(char *name, char *type) {
+    add_symbol(T, name, type, yylineno, "-");
+    printf("> Insert `%s` (addr: %d) to scope level %d\n", 
+           name, T->next_free_addr - 1, T->current_scope);
 }
 
 static void insert_func(char *name) {

@@ -38,3 +38,20 @@ void add_table(Table_head *T)
     ST->next = T->first;
     T->first = ST;
 }
+
+void add_symbol(Table_head *T, char *name, char *type, int lineno, char *func_sig)
+{
+    Node *N = init_node();
+    // copy table contents into new node
+    N->index = (T->first->index_cnt)++;
+    strncpy(N->name, name, ID_MAX_LEN);
+    strncpy(N->type, type, 8);
+    N->addr = (T->next_free_addr)++;
+    N->lineno = lineno;
+    strncpy(N->func_sig, func_sig, ID_MAX_LEN);
+    N->next = NULL;
+
+    enqueue(T->first->list, N);
+    printf("index: %d, name: %s, type: %s, addr: %d, line#: %d, func: %s\n",
+           N->index, N->name, N->type, N->addr, N->lineno, N->func_sig);
+}
