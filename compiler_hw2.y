@@ -162,8 +162,8 @@ Statement
     : DeclarationStmt NEWLINE
     | SimpleStmt NEWLINE
     | Block
-    /* | IfStmt
-    | ForStmt
+    | IfStmt
+    /* | ForStmt
     | SwitchStmt
     | CaseStmt */
     | PrintStmt NEWLINE
@@ -186,11 +186,17 @@ SimpleStmt
     | IncDecStmt
 ;
 
-/* IfStmt
-    :
+IfStmt
+    : IF Expression Block ElseStmt
 ;
 
-ForStmt
+ElseStmt
+    : ELSE IfStmt
+    | ELSE Block
+    | /* empty */
+;
+
+/* ForStmt
     :
 ;
 
