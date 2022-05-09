@@ -265,12 +265,13 @@ UnaryExpr
     : PrimaryExpr
     | ADD PrimaryExpr       { printf("POS\n"); }
     | SUB PrimaryExpr       { printf("NEG\n"); }
-    | NOT PrimaryExpr       { printf("NOT\n"); }
+    | NOT UnaryExpr         { printf("NOT\n"); }
 ;
 
 PrimaryExpr
     : Operand
     | STRING_LIT
+    | Boolean
     | ParenthesisExpr
 ;
 
@@ -278,6 +279,10 @@ Operand
     : Constant
     | IDENT             { lookup_symbol($1); }
 ;
+
+Boolean
+    : TRUE_             { printf("TRUE 1\n"); }
+    | FALSE_            { printf("FALSE 0\n"); }
 
 Constant
     : INT_LIT           { printf("INT_LIT %d\n", $1); }
