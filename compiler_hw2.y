@@ -353,9 +353,17 @@ static void lookup_symbol(char *name) {
 }
 
 static void dump_sym_table() {
-    printf("\n> Dump symbol table (scope level: %d)\n", 0);
+    printf("\n> Dump symbol table (scope level: %d)\n", T->current_scope);
     printf("%-10s%-10s%-10s%-10s%-10s%-10s\n",
            "Index", "Name", "Type", "Addr", "Lineno", "Func_sig");
-    printf("%-10d%-10s%-10s%-10d%-10d%-10s\n",
-            0, "name", "type", 0, 0, "func_sig");
+
+    Node *entry;
+    while (entry = dump_next_entry(T))
+    {
+        printf("%-10d%-10s%-10s%-10d%-10d%-10s\n",
+               entry->index, entry->name, entry->type,
+               entry->addr, entry->lineno, entry->func_sig);
+        free(entry);
+    }
+    delete_table(T);
 }
