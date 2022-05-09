@@ -33,9 +33,9 @@
     /* Global variables */
     bool HAS_ERROR = false;
     int SCOPE_LVL = 0;
-    int NEXT_FREE_ADDR = 0;
     char CURRENT_FUNC[ID_MAX_LEN];
     int CURRENT_FUNC_LINENO;
+    bool IN_FUNC_SCOPE = false;
     Table_head *T;
 %}
 
@@ -116,6 +116,7 @@ FuncOpen
         printf("func: %s\n", CURRENT_FUNC);
         SCOPE_LVL++;
         create_sym_table();
+        IN_FUNC_SCOPE = true;
     }
 ;
 
@@ -149,7 +150,7 @@ Type
 ;
 
 Block
-    : '{' StatementList '}'
+    : '{' { create_sym_table(); } StatementList '}' { dump_sym_table(); }
 ;
 
 StatementList
@@ -160,8 +161,8 @@ StatementList
 Statement
     : DeclarationStmt NEWLINE
     | SimpleStmt NEWLINE
-    /* | Block
-    | IfStmt
+    | Block
+    /* | IfStmt
     | ForStmt
     | SwitchStmt
     | CaseStmt */
@@ -304,8 +305,12 @@ int main(int argc, char *argv[])
 }
 
 static void create_sym_table() {
-    add_table(T);
-    printf("> Create symbol table (scope level %d)\n", T->current_scope);
+    if (!IN_FUNC_SCOPE)
+    {
+        add_table(T);
+        printf("> Create symbol table (scope level %d)\n", T->current_scope);
+    }
+    IN_FUNC_SCOPE = false;
 }
 
 static void insert_symbol(char *name, char *type) {
