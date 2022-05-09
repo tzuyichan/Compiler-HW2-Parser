@@ -163,8 +163,8 @@ Statement
     | SimpleStmt NEWLINE
     | Block
     | IfStmt
-    /* | ForStmt
-    | SwitchStmt
+    | ForStmt
+    /* | SwitchStmt
     | CaseStmt */
     | PrintStmt NEWLINE
     /* | ReturnStmt NEWLINE */
@@ -196,11 +196,16 @@ ElseStmt
     | /* empty */
 ;
 
-/* ForStmt
-    :
+ForStmt
+    : FOR Expression Block
+    | FOR ForClause Block
 ;
 
-SwitchStmt
+ForClause
+    : SimpleStmt ';' Expression ';' SimpleStmt
+;
+
+/* SwitchStmt
     :
 ;
 
