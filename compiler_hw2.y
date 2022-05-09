@@ -260,10 +260,16 @@ AddExpr
 ;
 
 MulExpr
+    : CastExpr
+    | MulExpr MUL CastExpr           { printf("MUL\n"); }
+    | MulExpr QUO CastExpr           { printf("QUO\n"); }
+    | MulExpr REM CastExpr           { printf("REM\n"); }
+;
+
+CastExpr
     : UnaryExpr
-    | MulExpr MUL UnaryExpr           { printf("MUL\n"); }
-    | MulExpr QUO UnaryExpr           { printf("QUO\n"); }
-    | MulExpr REM UnaryExpr           { printf("REM\n"); }
+    | INT '(' AddExpr ')'          { printf("f2i\n"); }
+    | FLOAT '(' AddExpr ')'        { printf("i2f\n"); }
 ;
 
 UnaryExpr
