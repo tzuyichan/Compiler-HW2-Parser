@@ -80,7 +80,7 @@ Result *get_entry(List *L, char *name)
 Node *dequeue(List *L)
 {
     Node *p;
-    if (p = L->first)
+    if ((p = L->first))
     {
         L->first = p->next;
         p->next = NULL;
@@ -92,7 +92,7 @@ Node *dequeue(List *L)
 void delete_list(List *L)
 {
     Node *p;
-    while (p = dequeue(L))
+    while ((p = dequeue(L)))
         free(p);
     free(L);
 }

@@ -369,7 +369,7 @@ static void dump_sym_table() {
            "Index", "Name", "Type", "Addr", "Lineno", "Func_sig");
 
     Node *entry;
-    while (entry = dump_next_entry(T))
+    while ((entry = dump_next_entry(T)))
     {
         printf("%-10d%-10s%-10s%-10d%-10d%-10s\n",
                entry->index, entry->name, entry->type,

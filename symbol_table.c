@@ -74,7 +74,7 @@ Result *find_symbol(Table_head *T, char *name)
 
     for (Table *p = T->first; p != NULL; p = p->next)
     {
-        if (R = get_entry(p->list, name))
+        if ((R = get_entry(p->list, name)))
             return R;
         if (!p->next)
             break;
@@ -91,7 +91,7 @@ Node *dump_next_entry(Table_head *T)
 void delete_table(Table_head *T)
 {
     Table *p;
-    if (p = T->first)
+    if ((p = T->first))
     {
         T->first = p->next;
         p->next = NULL;
