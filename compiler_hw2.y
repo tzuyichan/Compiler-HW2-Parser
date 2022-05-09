@@ -212,7 +212,12 @@ PrintStmt
 ; */
 
 AssignmentStmt
-    : IDENT ASSIGN Expression
+    : IDENT { lookup_symbol($1); } ASSIGN Expression { printf("ASSIGN\n"); }
+    | IDENT { lookup_symbol($1); } ADD_ASSIGN Expression { printf("ADD\n"); }
+    | IDENT { lookup_symbol($1); } SUB_ASSIGN Expression { printf("SUB\n"); }
+    | IDENT { lookup_symbol($1); } MUL_ASSIGN Expression { printf("MUL\n"); }
+    | IDENT { lookup_symbol($1); } QUO_ASSIGN Expression { printf("QUO\n"); }
+    | IDENT { lookup_symbol($1); } REM_ASSIGN Expression { printf("REM\n"); }
 ;
 
 IncDecStmt
