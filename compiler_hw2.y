@@ -34,7 +34,6 @@
     bool HAS_ERROR = false;
     char TYPE[8];
     char CURRENT_FUNC[ID_MAX_LEN];
-    int CURRENT_FUNC_LINENO;
     char FUNC_RET_TYPE;
     bool IN_FUNC_SCOPE = false;
     Table_head *T;
@@ -116,7 +115,6 @@ FuncOpen
     : FUNC IDENT {
         printf("func: %s\n", $2);
         strncpy(CURRENT_FUNC, $2, ID_MAX_LEN);
-        CURRENT_FUNC_LINENO = yylineno;
         create_sym_table();
         IN_FUNC_SCOPE = true;
     }
@@ -370,9 +368,9 @@ static void insert_symbol(char *name, char *type) {
     if (strcmp(type, "func") == 0)
     {
         // generate function signature
-        lineno = CURRENT_FUNC_LINENO;
         get_func_param_types(T, type_str);
         snprintf(func_sig, ID_MAX_LEN, "(%s)%c", type_str, FUNC_RET_TYPE);
+        lineno = yylineno + 1;
         printf("func_signature: %s\n", func_sig);
     }
     else
