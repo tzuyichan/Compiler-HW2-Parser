@@ -21,5 +21,6 @@ Result *add_symbol(Table_head *T, char *name, char *type, int lineno, char *func
 Result *find_symbol(Table_head *T, char *name);
 Node *dump_next_entry(Table_head *T);
 void delete_table(Table_head *T);
+void get_func_param_types(Table_head *T, char *type_str);
 
 #endif

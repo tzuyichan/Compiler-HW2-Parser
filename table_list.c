@@ -70,8 +70,6 @@ Result *get_entry(List *L, char *name)
             strncpy(R->type, p->type, 8);
             return R;
         }
-        if (!p->next)
-            break;
     }
 
     return NULL;
@@ -95,4 +93,13 @@ void delete_list(List *L)
     while ((p = dequeue(L)))
         free(p);
     free(L);
+}
+
+void list_entry_types(List *L, char *type_str)
+{
+    for (Node *p = L->first; p != NULL; p = p->next)
+    {
+        char type_abbrev = (p->type)[0] - 32; // ASCII case conversion
+        strncat(type_str, &type_abbrev, 1);
+    }
 }

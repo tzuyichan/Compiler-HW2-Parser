@@ -76,8 +76,6 @@ Result *find_symbol(Table_head *T, char *name)
     {
         if ((R = get_entry(p->list, name)))
             return R;
-        if (!p->next)
-            break;
     }
 
     return NULL;
@@ -101,4 +99,9 @@ void delete_table(Table_head *T)
 
     delete_list(p->list);
     free(p);
+}
+
+void get_func_param_types(Table_head *T, char *type_str)
+{
+    list_entry_types(T->first->list, type_str);
 }

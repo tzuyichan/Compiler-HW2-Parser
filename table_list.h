@@ -32,5 +32,6 @@ int enqueue(List *L, Node *N);
 Result *get_entry(List *L, char *name);
 Node *dequeue(List *L);
 void delete_list(List *L);
+void list_entry_types(List *L, char *type_str);
 
 #endif
