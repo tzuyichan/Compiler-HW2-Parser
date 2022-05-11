@@ -27,12 +27,14 @@
     static void create_sym_table();
     static void insert_symbol(char *name, char *type);
     static void lookup_symbol(char *name);
+    static void lookup_func(char *name);
     static void dump_sym_table();
     static char *check_type(char *nterm1, char *nterm2, int operator);
 
     /* Global variables */
     bool HAS_ERROR = false;
     char TYPE[8];
+    char FUNC_SIG[ID_MAX_LEN];
     char CURRENT_FUNC[ID_MAX_LEN];
     char FUNC_RET_TYPE;
     bool IN_FUNC_SCOPE = false;
@@ -137,7 +139,7 @@ FuncBlock
     
 ReturnStmt
     : RETURN                { printf("return\n"); }
-    | RETURN Expression     { printf("xreturn\n"); }
+    | RETURN Expression     { printf("%creturn\n", $2[0]); }
 ;
 
 ParameterIdentType
@@ -302,7 +304,11 @@ PrimaryExpr
 ;
 
 FunctionCall
-    : IDENT '(' FuncCallParamList ')' { $$ = "func"; printf("call: %s\n", $1); }
+    : IDENT '(' FuncCallParamList ')' {
+        lookup_func($1);
+        $$ = TYPE;
+        printf("call: %s%s\n", $1, FUNC_SIG);
+    }
 ;
 
 FuncCallParamList
@@ -338,6 +344,7 @@ int main(int argc, char *argv[])
 
     // initialize global strings
     memset(TYPE, 0, 8);
+    memset(FUNC_SIG, 0, ID_MAX_LEN);
     memset(CURRENT_FUNC, 0, ID_MAX_LEN);
 
     yylineno = 0;
@@ -388,12 +395,49 @@ static void insert_symbol(char *name, char *type) {
 }
 
 static void lookup_symbol(char *name) {
-    /* printf("lookup func called!\n"); */
     Result *R = find_symbol(T, name);
     if (R)
     {
         strncpy(TYPE, R->type, 8);
         printf("IDENT (name=%s, address=%d)\n", name, R->addr); 
+    }
+    else
+    {
+        strncpy(TYPE, "ERROR", 8);
+    }
+    free(R);
+}
+
+static void lookup_func(char *name)
+{
+    Result *R = find_symbol(T, name);
+    if (R)
+    {
+        strncpy(FUNC_SIG, R->func_sig, ID_MAX_LEN);
+
+        char ret_val = R->func_sig[strlen(R->func_sig) - 1];
+        switch (ret_val)
+        {
+            case 'I':
+                strncpy(TYPE, "int32", 8);
+                break;
+            case 'F':
+                strncpy(TYPE, "float32", 8);
+                break;
+            case 'B':
+                strncpy(TYPE, "bool", 8);
+                break;
+            case 'S':
+                strncpy(TYPE, "string", 8);
+                break;
+            default:
+                strncpy(TYPE, "ERROR", 8);
+        }
+    }
+    else
+    {
+        strncpy(FUNC_SIG, "-", ID_MAX_LEN);
+        strncpy(TYPE, "ERROR", 8);
     }
     free(R);
 }
