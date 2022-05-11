@@ -171,8 +171,8 @@ Statement
     | Block
     | IfStmt
     | ForStmt
-    /* | SwitchStmt
-    | CaseStmt */
+    | SwitchStmt
+    | CaseStmt
     | PrintStmt NEWLINE
     | ReturnStmt NEWLINE
     | NEWLINE
@@ -212,13 +212,14 @@ ForClause
     : SimpleStmt ';' Expression ';' SimpleStmt
 ;
 
-/* SwitchStmt
-    :
+SwitchStmt
+    : SWITCH Expression Block
 ;
 
 CaseStmt
-    :
-; */
+    : CASE INT_LIT { printf("case %d\n", $2); } ':' Block
+    | DEFAULT ':' Block
+;
 
 PrintStmt
     : PRINT ParenthesisExpr         { printf("PRINT %s\n", $2); }
