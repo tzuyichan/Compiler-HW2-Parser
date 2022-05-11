@@ -26,15 +26,15 @@
     /* parameters and return type can be changed */
     static void create_sym_table();
     static void insert_symbol(char *name, char *type);
-    static void insert_func();
     static void lookup_symbol(char *name);
     static void dump_sym_table();
 
     /* Global variables */
     bool HAS_ERROR = false;
-    int SCOPE_LVL = 0;
+    char TYPE[8];
     char CURRENT_FUNC[ID_MAX_LEN];
     int CURRENT_FUNC_LINENO;
+    char FUNC_RET_TYPE;
     bool IN_FUNC_SCOPE = false;
     Table_head *T;
 %}
@@ -102,8 +102,7 @@ PackageStmt
 
 FunctionDeclStmt
     : FuncOpen '(' ParameterList ')' ReturnType {
-        printf("func_signature: ()%c\n", $5[0]);
-        // insert_func(CURRENT_FUNC);
+        FUNC_RET_TYPE = $5[0] - 32;  // ASCII case conversion
         insert_symbol(CURRENT_FUNC, "func");
     }
     FuncBlock
@@ -111,10 +110,9 @@ FunctionDeclStmt
 
 FuncOpen
     : FUNC IDENT {
+        printf("func: %s\n", $2);
         strncpy(CURRENT_FUNC, $2, ID_MAX_LEN);
         CURRENT_FUNC_LINENO = yylineno;
-        printf("func: %s\n", CURRENT_FUNC);
-        SCOPE_LVL++;
         create_sym_table();
         IN_FUNC_SCOPE = true;
     }
@@ -137,7 +135,7 @@ FuncBlock
 
 ParameterIdentType
     : IDENT Type {
-        printf("param %s, type: %c\n", $1, $2[0]);
+        printf("param %s, type: %c\n", $1, $2[0] - 32);
         insert_symbol($1, $2);
     }
 ;
@@ -322,6 +320,9 @@ int main(int argc, char *argv[])
         yyin = stdin;
     }
 
+    // initialize global strings
+    memset(CURRENT_FUNC, 0, ID_MAX_LEN);
+
     yylineno = 0;
     T = init_table();
     yyparse();
@@ -342,12 +343,18 @@ static void create_sym_table() {
 
 static void insert_symbol(char *name, char *type) {
     int lineno;
+    char type_str[ID_MAX_LEN];
     char func_sig[ID_MAX_LEN];
+    memset(type_str, '\0', ID_MAX_LEN);
+    memset(func_sig, '\0', ID_MAX_LEN);
+
     if (strcmp(type, "func") == 0)
     {
         // generate function signature
         lineno = CURRENT_FUNC_LINENO;
-        strncpy(func_sig, "-", ID_MAX_LEN);
+        get_func_param_types(T, type_str);
+        snprintf(func_sig, ID_MAX_LEN, "(%s)%c", type_str, FUNC_RET_TYPE);
+        printf("func_signature: %s\n", func_sig);
     }
     else
     {
@@ -360,10 +367,8 @@ static void insert_symbol(char *name, char *type) {
 
     printf("> Insert `%s` (addr: %d) to scope level %d\n", 
            name, entry->addr, entry->scope);
-}
 
-static void insert_func(char *name) {
-    printf("> Insert `%s` (addr: %d) to scope level %d\n", name, -1, SCOPE_LVL - 1);
+    free(entry);
 }
 
 static void lookup_symbol(char *name) {
