@@ -132,6 +132,11 @@ ReturnType
 FuncBlock
     : Block
 ;
+    
+ReturnStmt
+    : RETURN                { printf("return\n"); }
+    | RETURN Expression     { printf("xreturn\n"); }
+;
 
 ParameterIdentType
     : IDENT Type {
@@ -165,7 +170,7 @@ Statement
     /* | SwitchStmt
     | CaseStmt */
     | PrintStmt NEWLINE
-    /* | ReturnStmt NEWLINE */
+    | ReturnStmt NEWLINE
     | NEWLINE
 ;
 
@@ -215,10 +220,6 @@ PrintStmt
     : PRINT ParenthesisExpr
     | PRINTLN ParenthesisExpr       { printf("PRINTLN %s\n", "int32"); }
 ;
-
-/* ReturnStmt
-    :
-; */
 
 AssignmentStmt
     : IDENT { lookup_symbol($1); } ASSIGN Expression { printf("ASSIGN\n"); }
