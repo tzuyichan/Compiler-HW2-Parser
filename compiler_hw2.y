@@ -28,6 +28,7 @@
     static void insert_symbol(char *name, char *type);
     static void lookup_symbol(char *name);
     static void dump_sym_table();
+    static char *check_type(char *nterm1, char *nterm2, int operator);
 
     /* Global variables */
     bool HAS_ERROR = false;
@@ -73,6 +74,9 @@
 
 /* Nonterminal with return, which need to sepcify type */
 %type <s_val> Type ReturnType 
+%type <s_val> ParenthesisExpr Expression 
+%type <s_val> LogOrExpr LogAndExpr CmpExpr AddExpr MulExpr
+%type <s_val> CastExpr UnaryExpr PrimaryExpr Boolean Operand Constant
 
 /* Yacc will start at this nonterminal */
 %start Program
@@ -126,7 +130,7 @@ ParameterList
 
 ReturnType
     : Type
-    | /* empty */       { $$ = "V"; }
+    | /* empty */       { $$ = "void"; }
 ;
 
 FuncBlock
@@ -236,7 +240,7 @@ IncDecStmt
 ;
 
 ParenthesisExpr
-    : '(' Expression ')'
+    : '(' Expression ')'        { $$ = $2; }
 ;
 
 Expression
@@ -245,69 +249,72 @@ Expression
 
 LogOrExpr
     : LogAndExpr
-    | LogOrExpr LOR LogAndExpr           { printf("LOR\n"); }
+    | LogOrExpr LOR LogAndExpr           { $$ = "bool"; printf("LOR\n"); }
 ;
 
 LogAndExpr
     : CmpExpr
-    | LogAndExpr LAND CmpExpr          { printf("LAND\n"); }
+    | LogAndExpr LAND CmpExpr          { $$ = "bool"; printf("LAND\n"); }
 ;
 
 CmpExpr
     : AddExpr
-    | CmpExpr EQL AddExpr           { printf("EQL\n"); }
-    | CmpExpr NEQ AddExpr           { printf("NEQ\n"); }
-    | CmpExpr LSS AddExpr           { printf("LSS\n"); }
-    | CmpExpr LEQ AddExpr           { printf("LEQ\n"); }
-    | CmpExpr GTR AddExpr           { printf("GTR\n"); }
-    | CmpExpr GEQ AddExpr           { printf("GEQ\n"); }
+    | CmpExpr EQL AddExpr          { $$ = "bool"; printf("EQL\n"); }
+    | CmpExpr NEQ AddExpr          { $$ = "bool"; printf("NEQ\n"); }
+    | CmpExpr LSS AddExpr          { $$ = "bool"; printf("LSS\n"); }
+    | CmpExpr LEQ AddExpr          { $$ = "bool"; printf("LEQ\n"); }
+    | CmpExpr GTR AddExpr          { $$ = "bool"; printf("GTR\n"); }
+    | CmpExpr GEQ AddExpr          { $$ = "bool"; printf("GEQ\n"); }
 ;
 
 AddExpr
     : MulExpr
-    | AddExpr ADD MulExpr           { printf("ADD\n"); }
-    | AddExpr SUB MulExpr           { printf("SUB\n"); }
+    | AddExpr ADD MulExpr           { $$ = check_type($1, $3, ADD); 
+    // printf("in Add: AddExpr=%s, MulExpr=%s\n",$1,$3);
+    printf("ADD\n"); }
+    | AddExpr SUB MulExpr           { $$ = check_type($1, $3, SUB); printf("SUB\n"); }
 ;
 
 MulExpr
     : CastExpr
-    | MulExpr MUL CastExpr           { printf("MUL\n"); }
-    | MulExpr QUO CastExpr           { printf("QUO\n"); }
-    | MulExpr REM CastExpr           { printf("REM\n"); }
+    | MulExpr MUL CastExpr           { $$ = check_type($1, $3, MUL); printf("MUL\n"); }
+    | MulExpr QUO CastExpr           { $$ = check_type($1, $3, QUO); printf("QUO\n"); }
+    | MulExpr REM CastExpr           { $$ = check_type($1, $3, REM); printf("REM\n"); }
 ;
 
 CastExpr
     : UnaryExpr
-    | INT '(' AddExpr ')'          { printf("f2i\n"); }
-    | FLOAT '(' AddExpr ')'        { printf("i2f\n"); }
+    | INT '(' AddExpr ')'          { $$ = "int32"; printf("f2i\n"); }
+    | FLOAT '(' AddExpr ')'        { $$ = "float32"; printf("i2f\n"); }
 ;
 
 UnaryExpr
     : PrimaryExpr
-    | ADD PrimaryExpr       { printf("POS\n"); }
-    | SUB PrimaryExpr       { printf("NEG\n"); }
-    | NOT UnaryExpr         { printf("NOT\n"); }
+    | ADD PrimaryExpr       { $$ = check_type($2, $2, ADD); printf("POS\n"); }
+    | SUB PrimaryExpr       { $$ = check_type($2, $2, SUB); printf("NEG\n"); }
+    | NOT UnaryExpr         { $$ = "bool"; printf("NOT\n"); }
 ;
 
 PrimaryExpr
     : Operand
-    | STRING_LIT
+    | '"' STRING_LIT '"'    { $$ = "string"; printf("STRING_LIT %s\n", $2); }
     | Boolean
     | ParenthesisExpr
 ;
 
 Operand
     : Constant
-    | IDENT             { lookup_symbol($1); }
+    | IDENT             { lookup_symbol($1); $$ = TYPE; }
 ;
 
 Boolean
-    : TRUE_             { printf("TRUE 1\n"); }
-    | FALSE_            { printf("FALSE 0\n"); }
+    : TRUE_             { $$ = "bool"; printf("TRUE 1\n"); }
+    | FALSE_            { $$ = "bool"; printf("FALSE 0\n"); }
+;
 
 Constant
-    : INT_LIT           { printf("INT_LIT %d\n", $1); }
-    | FLOAT_LIT         { printf("FLOAT_LIT %f\n", $1); } 
+    : INT_LIT           { $$ = "int32"; printf("INT_LIT %d\n", $1); }
+    | FLOAT_LIT         { $$ = "float32"; printf("FLOAT_LIT %f\n", $1); } 
 ;
 
 %%
@@ -322,6 +329,7 @@ int main(int argc, char *argv[])
     }
 
     // initialize global strings
+    memset(TYPE, 0, 8);
     memset(CURRENT_FUNC, 0, ID_MAX_LEN);
 
     yylineno = 0;
@@ -376,7 +384,10 @@ static void lookup_symbol(char *name) {
     /* printf("lookup func called!\n"); */
     Result *R = find_symbol(T, name);
     if (R)
+    {
+        strncpy(TYPE, R->type, 8);
         printf("IDENT (name=%s, address=%d)\n", name, R->addr); 
+    }
     free(R);
 }
 
@@ -393,5 +404,19 @@ static void dump_sym_table() {
                entry->addr, entry->lineno, entry->func_sig);
         free(entry);
     }
+    printf("\n");
     delete_table(T);
+}
+
+static char *check_type(char *nterm1, char *nterm2, int operator)
+{
+    if (strcmp(nterm1, nterm2) == 0)
+    {
+        return nterm1;
+    }
+    else
+    {
+        /* printf("nterm1: %s, nterm2: %s\n", nterm1, nterm2); */
+        return "ERROR";
+    }
 }
