@@ -76,7 +76,7 @@
 %type <s_val> Type ReturnType 
 %type <s_val> ParenthesisExpr Expression 
 %type <s_val> LogOrExpr LogAndExpr CmpExpr AddExpr MulExpr
-%type <s_val> CastExpr UnaryExpr PrimaryExpr Boolean Operand Constant
+%type <s_val> CastExpr UnaryExpr PrimaryExpr FunctionCall Boolean Operand Constant
 
 /* Yacc will start at this nonterminal */
 %start Program
@@ -300,7 +300,17 @@ PrimaryExpr
     | '"' STRING_LIT '"'    { $$ = "string"; printf("STRING_LIT %s\n", $2); }
     | Boolean
     | ParenthesisExpr
+    | FunctionCall
 ;
+
+FunctionCall
+    : IDENT '(' FuncCallParamList ')' { $$ = "func"; printf("call: %s\n", $1); }
+;
+
+FuncCallParamList
+    : FuncCallParamList ',' Expression
+    | Expression
+    | /* empty */
 
 Operand
     : Constant
