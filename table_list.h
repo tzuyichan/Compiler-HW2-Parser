@@ -24,6 +24,8 @@ typedef struct
     int scope;
     int addr;
     char type[8];
+    int lineno;
+    char func_sig[ID_MAX_LEN];
 } Result;
 
 List *init_list();

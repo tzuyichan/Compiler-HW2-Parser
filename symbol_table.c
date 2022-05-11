@@ -75,7 +75,10 @@ Result *find_symbol(Table_head *T, char *name)
     for (Table *p = T->first; p != NULL; p = p->next)
     {
         if ((R = get_entry(p->list, name)))
+        {
+            R->scope = p->scope;
             return R;
+        }
     }
 
     return NULL;

@@ -44,8 +44,6 @@ int enqueue(List *L, Node *N)
 
     for (p = L->first; p != NULL; p = p->next)
     {
-        if (p->name == N->name)
-            return -1;
         if (!p->next)
             break;
     } // p = last node in the linked list
@@ -68,6 +66,8 @@ Result *get_entry(List *L, char *name)
             FAIL_IF(!(R = malloc(sizeof(Result))), "Lookup result malloc failure!");
             R->addr = p->addr;
             strncpy(R->type, p->type, 8);
+            R->lineno = p->lineno;
+            strncpy(R->func_sig, p->func_sig, ID_MAX_LEN);
             return R;
         }
     }

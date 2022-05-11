@@ -307,8 +307,8 @@ PrimaryExpr
 FunctionCall
     : IDENT '(' FuncCallParamList ')' {
         lookup_func($1);
-        $$ = TYPE;
         printf("call: %s%s\n", $1, FUNC_SIG);
+        strncpy($$, TYPE, 8);
     }
 ;
 
@@ -369,9 +369,18 @@ static void create_sym_table() {
 static void insert_symbol(char *name, char *type) {
     char type_str[ID_MAX_LEN];
     char func_sig[ID_MAX_LEN];
-    memset(type_str, '\0', ID_MAX_LEN);
-    memset(func_sig, '\0', ID_MAX_LEN);
+    memset(type_str, 0, ID_MAX_LEN);
+    memset(func_sig, 0, ID_MAX_LEN);
 
+    // check if symbol has already been declared
+    Result *R = find_symbol(T, name);
+    if (R && R->scope == T->current_scope)
+    {
+        printf("error:%d: %s redeclared in this block. previous declaration at line %d\n",
+               yylineno, name, R->lineno);
+    }
+
+    // trick to fix wrong line number inside functions
     int lineno = IN_FUNC_SCOPE ? yylineno + 1 : yylineno;
 
     if (strcmp(type, "func") == 0)
@@ -397,6 +406,8 @@ static void insert_symbol(char *name, char *type) {
 
 static void lookup_symbol(char *name) {
     Result *R = find_symbol(T, name);
+    /* int lineno = IN_FUNC_SCOPE ? yylineno + 1 : yylineno; */
+
     if (R)
     {
         strncpy(TYPE, R->type, 8);
@@ -405,6 +416,7 @@ static void lookup_symbol(char *name) {
     else
     {
         strncpy(TYPE, "ERROR", 8);
+        printf("error:%d: undefined: %s\n", yylineno, name);
     }
     free(R);
 }
@@ -432,7 +444,7 @@ static void lookup_func(char *name)
                 strncpy(TYPE, "string", 8);
                 break;
             default:
-                strncpy(TYPE, "ERROR", 8);
+                strncpy(TYPE, "void", 8);
         }
     }
     else
