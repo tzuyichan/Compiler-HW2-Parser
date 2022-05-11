@@ -62,8 +62,6 @@ Result *add_symbol(Table_head *T, char *name, char *type, int lineno, char *func
     FAIL_IF(!(result = malloc(sizeof(Result))), "Insert result malloc failure!");
     result->addr = entry->addr;
     result->scope = is_func ? T->first->next->scope : T->current_scope;
-    // printf("index: %d, name: %s, type: %s, addr: %d, line#: %d, func: %s\n",
-    //        entry->index, entry->name, entry->type, entry->addr, entry->lineno, entry->func_sig);
 
     return result;
 }
