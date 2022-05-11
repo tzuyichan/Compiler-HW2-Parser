@@ -221,8 +221,8 @@ CaseStmt
 ; */
 
 PrintStmt
-    : PRINT ParenthesisExpr
-    | PRINTLN ParenthesisExpr       { printf("PRINTLN %s\n", "int32"); }
+    : PRINT ParenthesisExpr         { printf("PRINT %s\n", $2); }
+    | PRINTLN ParenthesisExpr       { printf("PRINTLN %s\n", $2); }
 ;
 
 AssignmentStmt
