@@ -150,8 +150,10 @@ ParameterIdentType
 ;
 
 Type
-    : INT           { $$ = "int32"; }
-    | FLOAT         { $$ = "float32"; }
+    : INT           { $$ = "int32";
+    printf("Type=INT: $$ = %p\n", $$);}
+    | FLOAT         { $$ = "float32";
+    printf("Type=FLOAT $$ = %p\n", $$);}
     | STRING        { $$ = "string"; }
     | BOOL          { $$ = "bool"; }
 ;
@@ -269,35 +271,37 @@ CmpExpr
 ;
 
 AddExpr
-    : MulExpr
+    : MulExpr {printf("Add=Mul: $$ = %s - %p, $1 = %s - %p\n", $$, $$, $1, $1);}
     | AddExpr ADD MulExpr           { $$ = check_type($1, $3, ADD); 
     // printf("in Add: AddExpr=%s, MulExpr=%s\n",$1,$3);
+    printf("Add: $$ = %s - %p, $1 = %s - %p, $3 = %s - %p\n", $$, $$, $1, $1, $3, $3);
     printf("ADD\n"); }
     | AddExpr SUB MulExpr           { $$ = check_type($1, $3, SUB); printf("SUB\n"); }
 ;
 
 MulExpr
-    : CastExpr
+    : CastExpr {printf("Mul=Cast: $$ = %p, $1 = %p\n", $$, $1);}
     | MulExpr MUL CastExpr           { $$ = check_type($1, $3, MUL); printf("MUL\n"); }
     | MulExpr QUO CastExpr           { $$ = check_type($1, $3, QUO); printf("QUO\n"); }
     | MulExpr REM CastExpr           { $$ = check_type($1, $3, REM); printf("REM\n"); }
 ;
 
 CastExpr
-    : UnaryExpr
-    | INT '(' AddExpr ')'          { $$ = "int32"; printf("f2i\n"); }
+    : UnaryExpr {printf("Cast=Unary: $$ = %p, $1 = %p\n", $$, $1);}
+    | INT '(' AddExpr ')'          { $$ = "int32"; printf("f2i\n");
+    printf("Cast=INT(Expr): $$ = %s - %p, $3 = %s - %p\n", $$, $$, $3, $3);}
     | FLOAT '(' AddExpr ')'        { $$ = "float32"; printf("i2f\n"); }
 ;
 
 UnaryExpr
-    : PrimaryExpr
+    : PrimaryExpr {printf("Unary=Primary: $$ = %p, $1 = %p\n", $$, $1);}
     | ADD PrimaryExpr       { $$ = check_type($2, $2, ADD); printf("POS\n"); }
     | SUB PrimaryExpr       { $$ = check_type($2, $2, SUB); printf("NEG\n"); }
     | NOT UnaryExpr         { $$ = "bool"; printf("NOT\n"); }
 ;
 
 PrimaryExpr
-    : Operand
+    : Operand {printf("Primary=Operand: $$ = %p, $1 = %p\n", $$, $1);}
     | '"' STRING_LIT '"'    { $$ = "string"; printf("STRING_LIT %s\n", $2); }
     | Boolean
     | ParenthesisExpr
@@ -316,10 +320,16 @@ FuncCallParamList
     : FuncCallParamList ',' Expression
     | Expression
     | /* empty */
+;
 
 Operand
-    : Constant
-    | IDENT             { lookup_symbol($1); $$ = TYPE; }
+    : Constant {printf("Operand=Constant: $$ = %p, $1 = %p\n", $$, $1);}
+    | IDENT             { 
+    printf("TYPE before: %s - %p\n", TYPE, TYPE);
+    lookup_symbol($1); strncpy($$, TYPE, 8); 
+    printf("TYPE after: %s - %p\n", TYPE, TYPE);
+    printf("Operand=IDENT: $$ = %p, $1 = %p\n", $$, TYPE);
+    }
 ;
 
 Boolean
@@ -480,7 +490,7 @@ static char *check_type(char *nterm1, char *nterm2, int operator)
     }
     else
     {
-        /* printf("nterm1: %s, nterm2: %s\n", nterm1, nterm2); */
+        printf("nterm1: %s - %p, nterm2: %s - %p\n", nterm1, nterm1, nterm2, nterm2);
         return "ERROR";
     }
 }
