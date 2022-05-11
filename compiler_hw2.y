@@ -359,23 +359,22 @@ static void create_sym_table() {
 }
 
 static void insert_symbol(char *name, char *type) {
-    int lineno;
     char type_str[ID_MAX_LEN];
     char func_sig[ID_MAX_LEN];
     memset(type_str, '\0', ID_MAX_LEN);
     memset(func_sig, '\0', ID_MAX_LEN);
+
+    int lineno = IN_FUNC_SCOPE ? yylineno + 1 : yylineno;
 
     if (strcmp(type, "func") == 0)
     {
         // generate function signature
         get_func_param_types(T, type_str);
         snprintf(func_sig, ID_MAX_LEN, "(%s)%c", type_str, FUNC_RET_TYPE);
-        lineno = yylineno + 1;
         printf("func_signature: %s\n", func_sig);
     }
     else
     {
-        lineno = yylineno;
         strncpy(func_sig, "-", ID_MAX_LEN);
     }
 
