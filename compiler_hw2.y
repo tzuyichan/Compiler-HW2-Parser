@@ -412,7 +412,7 @@ static void lookup_symbol(char *name) {
     else
     {
         strncpy(TYPE, "ERROR", 8);
-        printf("error:%d: undefined: %s\n", yylineno, name);
+        printf("error:%d: undefined: %s\n", yylineno + 1, name);
     }
     free(R);
 }
@@ -508,7 +508,7 @@ static char *check_type(char *nterm1, char *nterm2, char *op)
             return "bool";
         }
         printf("error:%d: non-bool (type %s) used as for condition\n",
-               yylineno, nterm1, op);
+               yylineno + 1, nterm1, op);
         return "ERROR";
     }
 
