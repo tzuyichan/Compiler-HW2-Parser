@@ -22,4 +22,4 @@ judge: all
 	@judge -v ${VERBOSE}
 
 clean:
-	rm -f ${TARGET} y.tab.* y.output lex.* *.o
+	rm -f ${TARGET} y.tab.* y.output lex.* *.o tmp.out
