@@ -29,7 +29,7 @@
     static void lookup_symbol(char *name);
     static void lookup_func(char *name);
     static void dump_sym_table();
-    static char *check_type(char *nterm1, char *nterm2, int operator);
+    static char *check_type(char *nterm1, char *nterm2, char *operator);
 
     /* Global variables */
     bool HAS_ERROR = false;
@@ -55,14 +55,9 @@
 
 /* Token without return */
 %token INT FLOAT BOOL STRING
-%token NOT TRUE_ FALSE_
-%token MUL QUO REM
-%token ADD SUB
+%token TRUE_ FALSE_
 %token INC DEC 
-%token EQL NEQ GTR GEQ LSS LEQ 
-%token LAND LOR
 %token VAR 
-%token ASSIGN ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN QUO_ASSIGN REM_ASSIGN
 %token IF ELSE FOR SWITCH CASE DEFAULT
 %token PRINT PRINTLN NEWLINE
 %token PACKAGE FUNC RETURN
@@ -71,6 +66,9 @@
 %token <i_val> INT_LIT
 %token <f_val> FLOAT_LIT
 %token <s_val> STRING_LIT IDENT 
+%token <s_val> ADD SUB MUL QUO REM
+%token <s_val> EQL NEQ GTR GEQ LSS LEQ NOT LAND LOR
+%token <s_val> ASSIGN ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN QUO_ASSIGN REM_ASSIGN
 
 /* Nonterminal with return, which need to sepcify type */
 %type <s_val> Type ReturnType 
@@ -193,7 +191,7 @@ SimpleStmt
 ;
 
 IfStmt
-    : IF Expression Block ElseStmt
+    : IF Expression { check_type($2, $2, "IF"); } Block ElseStmt
 ;
 
 ElseStmt
@@ -203,7 +201,7 @@ ElseStmt
 ;
 
 ForStmt
-    : FOR Expression Block
+    : FOR Expression { check_type($2, $2, "FOR"); } Block
     | FOR ForClause Block
 ;
 
@@ -226,12 +224,12 @@ PrintStmt
 ;
 
 AssignmentStmt
-    : IDENT { lookup_symbol($1); } ASSIGN Expression { printf("ASSIGN\n"); }
-    | IDENT { lookup_symbol($1); } ADD_ASSIGN Expression { printf("ADD\n"); }
-    | IDENT { lookup_symbol($1); } SUB_ASSIGN Expression { printf("SUB\n"); }
-    | IDENT { lookup_symbol($1); } MUL_ASSIGN Expression { printf("MUL\n"); }
-    | IDENT { lookup_symbol($1); } QUO_ASSIGN Expression { printf("QUO\n"); }
-    | IDENT { lookup_symbol($1); } REM_ASSIGN Expression { printf("REM\n"); }
+    : IDENT { lookup_symbol($1); strncpy($1, TYPE, 8); } ASSIGN Expression { check_type($1, $4, $3); printf("ASSIGN\n"); }
+    | IDENT { lookup_symbol($1); strncpy($1, TYPE, 8); } ADD_ASSIGN Expression { printf("ADD\n"); }
+    | IDENT { lookup_symbol($1); strncpy($1, TYPE, 8); } SUB_ASSIGN Expression { printf("SUB\n"); }
+    | IDENT { lookup_symbol($1); strncpy($1, TYPE, 8); } MUL_ASSIGN Expression { printf("MUL\n"); }
+    | IDENT { lookup_symbol($1); strncpy($1, TYPE, 8); } QUO_ASSIGN Expression { printf("QUO\n"); }
+    | IDENT { lookup_symbol($1); strncpy($1, TYPE, 8); } REM_ASSIGN Expression { printf("REM\n"); }
 ;
 
 IncDecStmt
@@ -249,35 +247,35 @@ Expression
 
 LogOrExpr
     : LogAndExpr
-    | LogOrExpr LOR LogAndExpr           { $$ = "bool"; printf("LOR\n"); }
+    | LogOrExpr LOR LogAndExpr           { $$ = check_type($1, $3, $2); printf("LOR\n"); }
 ;
 
 LogAndExpr
     : CmpExpr
-    | LogAndExpr LAND CmpExpr          { $$ = "bool"; printf("LAND\n"); }
+    | LogAndExpr LAND CmpExpr          { $$ = check_type($1, $3, $2); printf("LAND\n"); }
 ;
 
 CmpExpr
     : AddExpr
-    | CmpExpr EQL AddExpr          { $$ = "bool"; printf("EQL\n"); }
-    | CmpExpr NEQ AddExpr          { $$ = "bool"; printf("NEQ\n"); }
-    | CmpExpr LSS AddExpr          { $$ = "bool"; printf("LSS\n"); }
-    | CmpExpr LEQ AddExpr          { $$ = "bool"; printf("LEQ\n"); }
-    | CmpExpr GTR AddExpr          { $$ = "bool"; printf("GTR\n"); }
-    | CmpExpr GEQ AddExpr          { $$ = "bool"; printf("GEQ\n"); }
+    | CmpExpr EQL AddExpr          { $$ = check_type($1, $3, $2); printf("EQL\n"); }
+    | CmpExpr NEQ AddExpr          { $$ = check_type($1, $3, $2); printf("NEQ\n"); }
+    | CmpExpr LSS AddExpr          { $$ = check_type($1, $3, $2); printf("LSS\n"); }
+    | CmpExpr LEQ AddExpr          { $$ = check_type($1, $3, $2); printf("LEQ\n"); }
+    | CmpExpr GTR AddExpr          { $$ = check_type($1, $3, $2); printf("GTR\n"); }
+    | CmpExpr GEQ AddExpr          { $$ = check_type($1, $3, $2); printf("GEQ\n"); }
 ;
 
 AddExpr
     : MulExpr
-    | AddExpr ADD MulExpr           { $$ = check_type($1, $3, ADD); printf("ADD\n"); }
-    | AddExpr SUB MulExpr           { $$ = check_type($1, $3, SUB); printf("SUB\n"); }
+    | AddExpr ADD MulExpr           { $$ = check_type($1, $3, $2); printf("ADD\n"); }
+    | AddExpr SUB MulExpr           { $$ = check_type($1, $3, $2); printf("SUB\n"); }
 ;
 
 MulExpr
     : CastExpr
-    | MulExpr MUL CastExpr           { $$ = check_type($1, $3, MUL); printf("MUL\n"); }
-    | MulExpr QUO CastExpr           { $$ = check_type($1, $3, QUO); printf("QUO\n"); }
-    | MulExpr REM CastExpr           { $$ = check_type($1, $3, REM); printf("REM\n"); }
+    | MulExpr MUL CastExpr           { $$ = check_type($1, $3, $2); printf("MUL\n"); }
+    | MulExpr QUO CastExpr           { $$ = check_type($1, $3, $2); printf("QUO\n"); }
+    | MulExpr REM CastExpr           { $$ = check_type($1, $3, $2); printf("REM\n"); }
 ;
 
 CastExpr
@@ -288,9 +286,9 @@ CastExpr
 
 UnaryExpr
     : PrimaryExpr
-    | ADD PrimaryExpr       { $$ = check_type($2, $2, ADD); printf("POS\n"); }
-    | SUB PrimaryExpr       { $$ = check_type($2, $2, SUB); printf("NEG\n"); }
-    | NOT UnaryExpr         { $$ = "bool"; printf("NOT\n"); }
+    | ADD PrimaryExpr       { $$ = check_type($2, $2, $1); printf("POS\n"); }
+    | SUB PrimaryExpr       { $$ = check_type($2, $2, $1); printf("NEG\n"); }
+    | NOT UnaryExpr         { $$ = check_type($2, $2, $1); printf("NOT\n"); }
 ;
 
 PrimaryExpr
@@ -470,15 +468,63 @@ static void dump_sym_table() {
     delete_table(T);
 }
 
-static char *check_type(char *nterm1, char *nterm2, int operator)
+static char *check_type(char *nterm1, char *nterm2, char *op)
 {
-    if (strcmp(nterm1, nterm2) == 0)
+    if ((strcmp(op, "NOT") == 0 || strcmp(op, "LAND") == 0 || strcmp(op, "LOR") == 0))
     {
-        return nterm1;
+        if (strcmp(nterm1, nterm2) == 0 && strcmp(nterm1, "bool") == 0)
+        {
+            return "bool";
+        }
+        else
+        {
+            char *wrong_type = strcmp(nterm1, "bool") == 0 ? nterm2 : nterm1;
+            printf("error:%d: invalid operation: (operator %s not defined on %s)\n",
+                yylineno, op, wrong_type);
+            return "ERROR";
+        }
     }
-    else
+
+    if (strcmp(op, "REM") == 0)
     {
-        printf("nterm1: %s - %p, nterm2: %s - %p\n", nterm1, nterm1, nterm2, nterm2);
+        if (strcmp(nterm1, nterm2) == 0 && strcmp(nterm1, "int32") == 0)
+        {
+            return "int32";
+        }
+        else
+        {
+            char *wrong_type = strcmp(nterm1, "int32") == 0 ? nterm2 : nterm1;
+            printf("error:%d: invalid operation: (operator %s not defined on %s)\n",
+                yylineno, op, wrong_type);
+            return "ERROR";
+        }
+    }
+
+    if ((strcmp(op, "FOR") == 0 || strcmp(op, "IF") == 0)
+        && strcmp(nterm1, "bool") != 0)
+    {
+        if (strcmp(nterm1, "ERROR") == 0)  // don't test for error type in condition
+        {
+            return "bool";
+        }
+        printf("error:%d: non-bool (type %s) used as for condition\n",
+               yylineno, nterm1, op);
         return "ERROR";
     }
+
+    if (strcmp(nterm1, nterm2) != 0)
+    {
+        printf("error:%d: invalid operation: %s (mismatched types %s and %s)\n",
+               yylineno, op, nterm1, nterm2);
+        return "ERROR";
+    }
+
+    if (strcmp(op, "EQL") == 0 || strcmp(op, "NEQ") == 0
+        || strcmp(op, "LSS") == 0 || strcmp(op, "LEQ") == 0
+        || strcmp(op, "GTR") == 0 || strcmp(op, "GEQ") == 0)
+    {
+        return "bool";
+    }
+
+    return nterm1;
 }
